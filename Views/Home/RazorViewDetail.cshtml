@@ -1,0 +1,17 @@
+﻿
+@{
+    ViewBag.Title = "My change title ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2>RazorViewDetail</h2>
+
+<h2>Current date time is : @DateTime.Now.ToString()</h2>
+
+@{ 
+    var total = 100;
+    for (int index = 0; index < total; index++)
+    {
+        <p> @index </p>
+    } 
+}
