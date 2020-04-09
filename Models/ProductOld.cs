@@ -1,6 +1,6 @@
 ﻿namespace NewAssignment.Models
 {
-    public class Product
+    public class ProductOld
     {
         public int Id { get; set; }
         public string Name { get; set; }

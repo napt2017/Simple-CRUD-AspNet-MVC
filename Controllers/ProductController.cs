@@ -1,45 +1,57 @@
-﻿using Microsoft.Ajax.Utilities;
-using NewAssignment.Models;
-using System.Collections.Generic;
+﻿using System;
+using System.Data.Entity.Infrastructure;
+using System.Linq;
+using System.Security.AccessControl;
 using System.Web.Mvc;
 
 namespace NewAssignment.Controllers
 {
     public class ProductController : Controller
     {
-        private static int id = 2;
-        private static List<Product> products = new List<Product>() 
-        {
-            new Product 
-            {
-                Id = 1,
-                Name = "iPhone",
-                Price = 100f,
-                Quantity = 20
-            }
-        };
+        private AssignmentEntities assignmentEntities;
 
-        
+        public ProductController()
+        {
+            assignmentEntities = new AssignmentEntities();
+        }
+
+        //private static int id = 2;
+        //private static List<Product> products = new List<Product>() 
+        //{
+        //    new Product 
+        //    {
+        //        Id = 1,
+        //        Name = "iPhone",
+        //        Price = 100f,
+        //        Quantity = 20
+        //    }
+        //};
+
+
         // GET: Product
         public ActionResult Index()
         {
-            ViewBag.TimeAccess = System.DateTime.Now;
-            ViewData["MessageFromActionMethod"] = "Hello world";
-            return View(products);
+            //ViewBag.TimeAccess = System.DateTime.Now;
+            //ViewData["MessageFromActionMethod"] = "Hello world";
+            //return View(products);
+
+            var allProduct = assignmentEntities.Products.ToList();
+            return View(allProduct);
         }
 
         // GET: Product/Details/5
         public ActionResult Details(int id)
         {
-            var foundProduct = products.Find(product => product.Id == id);
-            if (foundProduct == null)
-            {
-                return RedirectToAction("NotFound");
-            }
-            else
-            {
-                return View(foundProduct);
-            }
+            //var foundProduct = products.Find(product => product.Id == id);
+            //if (foundProduct == null)
+            //{
+            //    return RedirectToAction("NotFound");
+            //}
+            //else
+            //{
+            //    return View(foundProduct);
+            //}
+            return View();
         }
 
         public HttpStatusCodeResult NotFound()
@@ -60,22 +72,25 @@ namespace NewAssignment.Controllers
         {
             try
             {
-                //var id = int.Parse(collection.Get("Id"));
                 var name = collection.Get("Name");
-                var price = float.Parse(collection.Get("Price"));
+                var price = double.Parse(collection.Get("Price"));
                 var quantity = int.Parse(collection.Get("Quantity"));
 
                 var newProduct = new Product();
-                newProduct.Id = id++;
+                newProduct.Id = 1;
                 newProduct.Name = name;
                 newProduct.Price = price;
                 newProduct.Quantity = quantity;
 
-                products.Add(newProduct);
+                // Save
+                assignmentEntities.Products.Add(newProduct);
+                assignmentEntities.SaveChanges();
+
                 return RedirectToAction("Index");
             }
-            catch
+            catch(DbUpdateException ex)
             {
+                Console.WriteLine(ex.Message);
                 return View();
             }
         }
@@ -83,7 +98,17 @@ namespace NewAssignment.Controllers
         // GET: Product/Edit/5
         public ActionResult Edit(int id)
         {
-            var foundProduct = products.Find(product => product.Id == id);
+            //var foundProduct = products.Find(product => product.Id == id);
+            //if (foundProduct == null)
+            //{
+            //    return RedirectToAction("NotFound");
+            //}
+            //else
+            //{
+            //    return View(foundProduct);
+            //}
+
+            var foundProduct = assignmentEntities.Products.Where(product => product.Id == id).FirstOrDefault();
             if (foundProduct == null)
             {
                 return RedirectToAction("NotFound");
@@ -91,7 +116,7 @@ namespace NewAssignment.Controllers
             else
             {
                 return View(foundProduct);
-            }
+            } 
         }
 
         // POST: Product/Edit/5
@@ -101,17 +126,31 @@ namespace NewAssignment.Controllers
             try
             {
                 // Find old product
-                var foundProduct = products.Find(product => product.Id == id);
+                //var foundProduct = products.Find(product => product.Id == id);
 
-                // Get the updated data
+                //// Get the updated data
+                //var name = collection.Get("Name");
+                //var price = float.Parse(collection.Get("Price"));
+                //var quantity = int.Parse(collection.Get("Quantity"));
+
+                //// Set back to old product
+                //foundProduct.Name = name;
+                //foundProduct.Price = price;
+                //foundProduct.Quantity = quantity;
+
+
+                var foundProduct = assignmentEntities.Products.Where(product => product.Id == id).FirstOrDefault();
+                //// Get the updated data
                 var name = collection.Get("Name");
                 var price = float.Parse(collection.Get("Price"));
                 var quantity = int.Parse(collection.Get("Quantity"));
 
-                // Set back to old product
                 foundProduct.Name = name;
                 foundProduct.Price = price;
                 foundProduct.Quantity = quantity;
+
+                // Save 
+                assignmentEntities.SaveChanges();
 
                 return RedirectToAction("Index");
             }
@@ -125,7 +164,17 @@ namespace NewAssignment.Controllers
         public ActionResult Delete(int id)
         {
             // Find old product
-            var foundProduct = products.Find(product => product.Id == id);
+            //var foundProduct = products.Find(product => product.Id == id);
+            //if (foundProduct == null)
+            //{
+            //    return RedirectToAction("NotFound");
+            //}
+            //else
+            //{
+            //    return View(foundProduct);
+            //}
+
+            var foundProduct = assignmentEntities.Products.Where(product => product.Id == id).FirstOrDefault();
             if (foundProduct == null)
             {
                 return RedirectToAction("NotFound");
@@ -133,7 +182,7 @@ namespace NewAssignment.Controllers
             else
             {
                 return View(foundProduct);
-            }
+            } 
         }
 
         // POST: Product/Delete/5
@@ -142,8 +191,11 @@ namespace NewAssignment.Controllers
         {
             try
             {
-                var foundProduct = products.Find(product => product.Id == id);
-                products.Remove(foundProduct);
+                //var foundProduct = products.Find(product => product.Id == id);
+                //products.Remove(foundProduct);
+                var foundProduct = assignmentEntities.Products.Where(product => product.Id == id).FirstOrDefault();
+                assignmentEntities.Products.Remove(foundProduct);
+                assignmentEntities.SaveChanges();
                 return RedirectToAction("Index");
             }
             catch
